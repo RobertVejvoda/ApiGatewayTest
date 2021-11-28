@@ -38,6 +38,7 @@ static_resources:
                 match:
                   prefix: "/c/"
                 route:
+                  auto_host_rewrite: true
                   prefix_rewrite: "/v1.0/invoke/coffee-api/method/"
                   cluster: dapr
               - name: coffee-long
@@ -51,6 +52,7 @@ static_resources:
                 match:
                   prefix: "/t/"
                 route:
+                  auto_host_rewrite: true
                   prefix_rewrite: "/v1.0/invoke/tea-api/method/"
                   cluster: dapr
               - name: tea-long

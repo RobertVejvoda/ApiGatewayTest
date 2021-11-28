@@ -30,35 +30,34 @@ static_resources:
               - match:
                   prefix: "/c"
                 route:
-                  prefix_rewrite: "/coffee"
-                  cluster: coffee_service
+                  prefix_rewrite: "/v1.0/invoke/coffee-api/method/"
+                  cluster: dapr
+              - match:
+                  prefix: "/coffee"
+                route:
+                  prefix_rewrite: "/v1.0/invoke/coffee-api/method/"
+                  cluster: dapr
               - match:
                   prefix: "/t"
                 route:
-                  prefix_rewrite: "/tea"
-                  cluster: tea_service
+                  prefix_rewrite: "/v1.0/invoke/tea-api/method/"
+                  cluster: dapr
+              - match:
+                  prefix: "/tea"
+                route:
+                  prefix_rewrite: "/v1.0/invoke/tea-api/method/"
+                  cluster: dapr
+
   clusters:
-  - name: coffee_service
+  - name: dapr
     type: STRICT_DNS
     lb_policy: ROUND_ROBIN
     load_assignment:
-      cluster_name: coffee_service
+      cluster_name: dapr
       endpoints:
       - lb_endpoints:
         - endpoint:
             address:
               socket_address:
-                address: coffeeapi
-                port_value: 80
-  - name: tea_service
-    type: STRICT_DNS
-    lb_policy: ROUND_ROBIN
-    load_assignment:
-      cluster_name: tea_service
-      endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: teaapi
-                port_value: 80    
+                address: 127.0.0.1
+                port_value: 3500

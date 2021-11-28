@@ -7,42 +7,87 @@ services:
     ports:
       - "9901:9901"
       - "10000:10000"
+      - "3500:3500"
     volumes:
       - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - ./Envoy/https.crt:/etc/ssl/certs/https.crt
       - ./Envoy/key.pem:/etc/ssl/certs/key.pem
+  
+  envoy-dapr:
+    image: "daprio/daprd:1.5.0"
+    network_mode: "service:envoy"
+    depends_on:
+      - envoy
+      - dapr-placement
+    command: ["./daprd",
+      "-app-id", "envoy",
+      "-app-port", "10000",
+      "-log-level", "debug",
+      "-placement-host-address", "dapr-placement:50006"
+      ]
 
-  coffeeapi:
-    image: ${DOCKER_REGISTRY:-}coffeeapi:${TAG:-latest}
+  coffee-api:
+    image: ${DOCKER_REGISTRY:-}coffee-api:${TAG:-latest}
     build: 
       context: .
       dockerfile: API/Coffee/Dockerfile
     ports:
       - "8080:80"
-      - "8081:443"
     environment:
-      ASPNETCORE_URLS: "https://+;http://+"
+      ASPNETCORE_URLS: "http://+"
       ASPNETCORE_HTTPS_PORT: "8081"
       ASPNETCORE_ENVIRONMENT: "Development"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
 
-  teaapi:
-    image: ${DOCKER_REGISTRY:-}teaapi:${TAG:-latest}
+  coffee-api-dapr:
+    image: "daprio/daprd:edge"
+    network_mode: "service:coffee-api"
+    depends_on:
+      - coffee-api
+      - dapr-placement
+    command: ["./daprd",
+      "-app-id", "coffee-api",
+      "-app-port", "80",
+      "-log-level", "debug",
+      "-placement-host-address", "dapr-placement:50006"
+      ]   
+
+  tea-api:
+    image: ${DOCKER_REGISTRY:-}tea-api:${TAG:-latest}
     build: 
       context: .
       dockerfile: API/Tea/Dockerfile
     ports:
       - "8082:80"
-      - "8083:443"
     environment:
-      ASPNETCORE_URLS: "https://+;http://+"
+      ASPNETCORE_URLS: "http://+"
       ASPNETCORE_HTTPS_PORT: "8083"
       ASPNETCORE_ENVIRONMENT: "Development"
     volumes:
       - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
       - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
 
+  tea-api-dapr:
+    image: "daprio/daprd:edge"
+    network_mode: "service:tea-api"
+    depends_on:
+      - tea-api
+      - dapr-placement
+    command: ["./daprd",
+      "-app-id", "tea-api",
+      "-app-port", "80",
+      "-log-level", "debug",
+      "-placement-host-address", "dapr-placement:50006"
+      ]   
+
+  dapr-placement:
+    image: "daprio/dapr"
+    command: ["./placement", "-port", "50006", "-log-level", "debug"]
+    ports:
+      - "50006:50006"
+
 networks:
-  apigatewaytest:
+  default:
+    name: apigatewaytest

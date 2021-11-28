@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace TeaAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("")]
     public class TeaController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

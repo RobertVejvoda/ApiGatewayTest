@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace CoffeeAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("")]
     public class CoffeeController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

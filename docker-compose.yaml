@@ -7,7 +7,7 @@ services:
     ports:
       - "9901:9901"
       - "10000:10000"
-      - "3500:3500"
+      - "10001:10001"
     volumes:
       - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - ./Envoy/https.crt:/etc/ssl/certs/https.crt
@@ -33,8 +33,9 @@ services:
       dockerfile: API/Coffee/Dockerfile
     ports:
       - "8080:80"
+      - "8081:443"
     environment:
-      ASPNETCORE_URLS: "http://+"
+      ASPNETCORE_URLS: "https://+;http://+"
       ASPNETCORE_HTTPS_PORT: "8081"
       ASPNETCORE_ENVIRONMENT: "Development"
     volumes:
@@ -61,8 +62,9 @@ services:
       dockerfile: API/Tea/Dockerfile
     ports:
       - "8082:80"
+      - "8083:443"
     environment:
-      ASPNETCORE_URLS: "http://+"
+      ASPNETCORE_URLS: "https://+;http://+"
       ASPNETCORE_HTTPS_PORT: "8083"
       ASPNETCORE_ENVIRONMENT: "Development"
     volumes:
